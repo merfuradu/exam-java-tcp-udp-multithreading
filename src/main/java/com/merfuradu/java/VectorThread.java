@@ -1,17 +1,17 @@
 package com.merfuradu.java;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.lang.Runnable; // Add this import statement
 
 public class VectorThread implements Runnable {
-    private List<Vehicle> carList;
+    private ArrayList<Vehicle> carList;
     private double avgWeight;
 
     public VectorThread(String file) {
         this.carList = Utils.readBinaryCars(file);
     }
 
-    public List<Vehicle> getCarList() {
+    public ArrayList<Vehicle> getCarList() {
         return this.carList;
     }
 

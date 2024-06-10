@@ -59,8 +59,8 @@ public class Utils {
     }
 
     // 4.d.
-    public static List<Vehicle> readBinaryCars(String file) {
-        List<Vehicle> vehicles = new ArrayList<>();
+    public static ArrayList<Vehicle> readBinaryCars(String file) {
+        ArrayList<Vehicle> vehicles = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             while (true) {
                 try {
