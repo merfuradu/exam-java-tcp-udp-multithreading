@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class TCPServerSocketMultiT {
     }
 
     public void startTCPServer() throws IOException {
-        ServerSocket server = new ServerSocket(50001);
+        System.out.println("The server is open and waiting for connections");
 
         while (true) {
             Socket clientSocket = server.accept();
@@ -49,7 +51,8 @@ public class TCPServerSocketMultiT {
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-
+                    PrintWriter outt = new PrintWriter(clientSocket.getOutputStream(), true);
+                    outt.println("Welcome to the server");
                     VectorThread vt = new VectorThread(this.f.getAbsolutePath());
                     ArrayList<Vehicle> vehicles = vt.getCarList();
                     List<Car> cars = new ArrayList<>();
@@ -59,7 +62,6 @@ public class TCPServerSocketMultiT {
                             cars.add((Car) veh);
                         }
                     }
-
                     String messageFromClient;
                     while ((messageFromClient = in.readLine()) != null) {
                         if ("EXIT".equals(messageFromClient)) {
@@ -67,7 +69,20 @@ public class TCPServerSocketMultiT {
                             break;
                         } else if (messageFromClient.equals("GETFILE")) {
                             out.writeObject(cars);
+                            out.flush();
                             System.out.println("The cars list was sent to the client");
+                        } else if (messageFromClient.equals("GETDB")) {
+                            try {
+                                UtilsDAO.setConnection();
+                                String data = UtilsDAO.selectData(UtilsDAO.getConnection());
+                                out.writeObject(data);
+                                out.flush();
+                                System.out.println("The database informations were sent to the client!");
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            outt.println("You said: " + messageFromClient);
                         }
                     }
                 } catch (IOException e) {
@@ -139,7 +154,7 @@ public class TCPServerSocketMultiT {
 
     public static void main(String[] args) {
         try {
-            int port = 50002;
+            int port = 50001;
             TCPServerSocketMultiT server = new TCPServerSocketMultiT(port);
             server.setFileName("carList.txt");
             server.startTCPServer();
